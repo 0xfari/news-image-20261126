@@ -4,7 +4,7 @@
 [![rank](https://make.fun/badge/news-image-20261126/0xfari/news-image-20261126/rank.svg)](https://make.fun/bounty/news-image-20261126/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261126)
 [![reward](https://make.fun/badge/news-image-20261126/0xfari/news-image-20261126/reward.svg)](https://make.fun/bounty/news-image-20261126?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261126)
 
-The world in one day: a newspaper front page sums up Thursday 26 November 2026 in six stories. The lead: the Houthis claim a strike on Saudi Arabia's Ras Tanura oil refinery as Brent crude jumps to $94.61. Inside: the U.S. unveils new Section 301 tariffs on 14 nations; a fuel tanker fire kills at least 30 in Cairo; Israel kills a Hamas official in Gaza as the ceasefire strains; plus Pakistan's first astronaut heads to China's space station, Gukesh draws Game 2 of the world chess final, and India marks 18 years since the 26/11 Mumbai attacks.
+A data-led newspaper front page for Thursday 26 November 2026. The lead is the tariff storm: Washington's new Section 301 tariff round sends the Nasdaq down 2% toward a bear market, Nvidia 6% lower and 35% off its October peak, with the KOSPI down 6% and the Nikkei down almost 3% — charted in a "Day in Markets" box. Below it, the Houthis' strike on Saudi Arabia's largest refinery lifts Brent to $94.81 and U.S. crude to $84.24. At the foot: Anthropic slips below its IPO price, the Bank of Korea lifts its rate to 3.25%, and Wall Street shuts for Thanksgiving. The page was drawn programmatically from the day's verified Reuters reporting — no photo, no fetched assets, no network at runtime.
 
 ## Run it
 

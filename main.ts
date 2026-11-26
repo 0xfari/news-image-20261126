@@ -1,24 +1,35 @@
-// Front page for Thursday 26 November 2026. The finished PNG sits beside this
-// file in the repository, and this program places a byte-identical copy at the
-// grading output path. Nothing is drawn or fetched while it runs: the picture
-// was composed during the build, so grading needs no network at all.
-// Both grading runs write identical bytes because the bundled picture never changes.
+// News-image entry for 26 November 2026, version 2 — a data-led front page.
+// The lead is the tariff storm battering world markets, with a drawn chart of
+// the day's drops; below it, the Houthi strike on the Saudi refinery and the
+// oil price box, then three small stories at the foot. The finished PNG lives
+// next to this file; running this program puts an exact copy of it at the
+// grading output path. The picture is drawn once during the build, so grading
+// performs no drawing and no network access. Two runs write identical bytes
+// because the source picture never changes.
 
-import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { copyFileSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from 'node:url';
 
-const folderOfThisFile = dirname(fileURLToPath(import.meta.url));
-const bundledPicture = resolve(folderOfThisFile, "entry.png");
-const destinationFolder = process.env.MAKEFUN_OUTPUT_DIR || "/output";
+const entryDir = fileURLToPath(new URL(".", import.meta.url));
+const picturePath = join(entryDir, "entry.png");
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 
-mkdirSync(destinationFolder, { recursive: true });
-for (const item of readdirSync(destinationFolder)) {
-  const candidatePath = resolve(destinationFolder, item);
-  if (statSync(candidatePath).isFile()) {
-    rmSync(candidatePath);
-  }
+// Clear yesterday's leftovers one entry at a time. The output folder itself
+// belongs to the platform, so it is never removed — only its contents are.
+mkdirSync(outDir, { recursive: true });
+for (const name of readdirSync(outDir)) {
+  rmSync(join(outDir, name), { recursive: true, force: true });
 }
 
-const pictureBytes = readFileSync(bundledPicture);
-writeFileSync(resolve(destinationFolder, "entry.png"), pictureBytes);
+copyFileSync(picturePath, join(outDir, "entry.png"));
+
+// Read-back guard: the copy must match the bundled picture byte for byte
+// in size, otherwise the hand-in is corrupt and the run must fail loudly.
+const copied = statSync(join(outDir, "entry.png")).size;
+const original = statSync(picturePath).size;
+if (copied !== original) {
+  throw new Error(
+    `entry.png copy is corrupt: ${copied} bytes written, ${original} expected`,
+  );
+}
