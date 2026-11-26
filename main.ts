@@ -1,43 +1,46 @@
-// v5 "The Day in Numbers" — a data poster summing up Thursday 26 November 2026.
-// The image is entry.png beside this file, drawn programmatically (PIL, 2x
-// supersampled, LANCZOS downscale) so every numeral is exact and legible.
-// This program copies it to the output directory and verifies the copy
-// byte for byte, so both grader runs write identical bytes.
-// Deterministic by design: copy, verify bytes, print size — nothing else.
+// v6 "Two Fronts, One Day" — a magazine cover for Wednesday 26 November 2026.
+// The cover art is entry.png beside this file: a split scene of Wall Street
+// under a plunging red chart line and the Ras Tanura refinery under black
+// smoke, with the day's numbers set in type by a PIL build script so every
+// figure is exact. This program moves those bytes to the output directory
+// and proves the move by comparing the written bytes with the source bytes.
 //
+// v6 cover check: the two front labels sit on the art band, not the data band.
+// It writes exactly one file and nothing else. The output directory is never
+// removed itself, only emptied, so repeated runs stay idempotent.
+//
+// Footer strip carries the four second-order facts so the data band stays clean.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
-import { createHash } from 'node:crypto';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const SOURCE = join(HERE, 'entry.png');
 const OUT_DIR = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-const OUT_PATH = join(OUT_DIR, 'entry.png');
+const SOURCE_PATH = new URL('./entry.png', import.meta.url);
+const TARGET_PATH = join(OUT_DIR, 'entry.png');
 
-function sha256Of(path: string): string {
-  return createHash('sha256').update(readFileSync(path)).digest('hex');
-}
-
-function clearInside(dir: string): void {
-  // Only files inside the output dir are removed; the dir itself is never deleted.
+function emptyDir(dir: string): void {
   mkdirSync(dir, { recursive: true });
-  for (const name of readdirSync(dir)) {
-    rmSync(join(dir, name), { force: true, recursive: true });
+  for (const item of readdirSync(dir)) {
+    rmSync(join(dir, item), { force: true, recursive: true });
   }
 }
 
-if (!existsSync(SOURCE)) {
-  throw new Error(`missing source image: ${SOURCE}`);
+function main(): void {
+  if (!existsSync(SOURCE_PATH)) {
+    throw new Error('v6 source image is missing from the entry directory');
+  }
+  const payload = readFileSync(SOURCE_PATH);
+  emptyDir(OUT_DIR);
+  writeFileSync(TARGET_PATH, payload);
+  const written = readFileSync(TARGET_PATH);
+  if (!payload.equals(written)) {
+    throw new Error(
+      `v6 copy mismatch: wrote ${written.length} bytes, source has ${payload.length}`,
+    );
+  }
+  console.log(`wrote ${TARGET_PATH} (${written.length} bytes)`);
 }
-const expectedHash = sha256Of(SOURCE);
-clearInside(OUT_DIR);
-copyFileSync(SOURCE, OUT_PATH);
-const writtenHash = sha256Of(OUT_PATH);
-if (writtenHash !== expectedHash) {
-  throw new Error(`copy mismatch: wrote ${writtenHash}, expected ${expectedHash}`);
-}
-console.log(`wrote ${OUT_PATH} (${statSync(OUT_PATH).size} bytes)`);
+
+main();
